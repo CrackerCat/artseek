@@ -4,6 +4,15 @@
   "description": "Root, zero-injection, read-only Android ART heap & View inspector SDK",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/std-microblock/artseek.git",
+    "directory": "sdk"
+  },
+  "homepage": "https://github.com/std-microblock/artseek#readme",
+  "bugs": {
+    "url": "https://github.com/std-microblock/artseek/issues"
+  },
   "engines": {
     "node": ">=18.0.0"
   },
