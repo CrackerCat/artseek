@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/android-arm64--v8a-3DDC84?style=flat-square" alt="Android arm64-v8a" />
 </p>
 
-Zero-injection, read-only Android ART heap & View inspector over persistent NDJSON stdio. Query live objects and View layout from TypeScript without Frida or Xposed.
+Zero-injection, read-only Android ART heap inspector. Query live objects from TypeScript without Frida or Xposed.
 
 ## Install
 
