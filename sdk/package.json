@@ -45,7 +45,8 @@
     "typecheck": "tsc -p tsconfig.typecheck.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "clean": "node -e \"import('node:fs').then(fs => fs.rmSync('dist', { recursive: true, force: true }))\""
+    "clean": "node -e \"import('node:fs').then(fs => fs.rmSync('dist', { recursive: true, force: true }))\"",
+    "prepublishOnly": "node -e \"import('node:fs').then(fs => { const p = 'dist/bin/artseek-android-arm64'; if (!fs.existsSync(p)) { console.error('refusing to publish: ' + p + ' is missing (download the CI arm64-v8a artifact into dist/bin first)'); process.exit(1); } })\""
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
