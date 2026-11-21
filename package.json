@@ -1,0 +1,14 @@
+{
+  "name": "artseek-monorepo",
+  "private": true,
+  "description": "Root, zero-injection, read-only Android ART heap & View inspector",
+  "scripts": {
+    "sdk:install": "npm --prefix sdk install",
+    "sdk:build": "npm --prefix sdk run build",
+    "sdk:test": "npm --prefix sdk test",
+    "sdk:typecheck": "npm --prefix sdk run typecheck",
+    "build:native": "xmake f -p android -a arm64-v8a -m release && xmake",
+    "build": "npm run sdk:build",
+    "test": "npm run sdk:test"
+  }
+}

@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+build/
+.xmake/
+sdk/dist/
+coverage/
+.vitest/
+
+# Native / Android / DEX artifacts
+*.o
+*.obj
+*.a
+*.so
+*.dex
+*.class
+*.jar
+*.d
+
+# Logs & OS files
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+.DS_Store
+Thumbs.db

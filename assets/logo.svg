@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" fill="none">
+  <!-- Minimalist downward-diving whale tail (seek) -->
+  <path
+    d="M 58 58
+       C 58 47, 51 41, 41 35
+       C 34 30, 33 22, 39 18
+       C 45 14, 54 22, 62 34
+       C 68 26, 78 24, 88 27
+       C 94 29, 96 34, 91 39
+       C 84 45, 74 46, 69 50
+       C 66 53, 66 56, 66 58"
+    stroke="#6E9BFF"
+    stroke-width="6.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Minimalist Android robot head (ART) -->
+  <g stroke="#3DDC84" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="46" y1="77" x2="38" y2="65"/>
+    <line x1="82" y1="77" x2="90" y2="65"/>
+    <path d="M 30 108 A 34 33 0 0 1 98 108 Z"/>
+  </g>
+  <circle cx="50" cy="93" r="3.5" fill="#3DDC84"/>
+  <circle cx="78" cy="93" r="3.5" fill="#3DDC84"/>
+</svg>
