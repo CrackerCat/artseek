@@ -45,7 +45,7 @@ public:
 
     bool open(int pid, std::string* err = nullptr);
     void close();
-    bool isOpen() const { return pid_ > 0 && memFd_ >= 0; }
+    bool isOpen() const { return open_; }
     int pid() const { return pid_; }
 
     bool refreshMaps(std::string* err = nullptr);
@@ -56,7 +56,7 @@ public:
     bool isMapped(uint64_t addr) const;
     bool isMappedRange(uint64_t addr, size_t len) const;
 
-    // Raw uncached read (uses process_vm_readv with pread fallback)
+    // Raw uncached read (uses process_vm_readv with lazy /proc/<pid>/mem pread fallback)
     size_t readRaw(uint64_t addr, void* dst, size_t len);
 
     // Page-cached reads for random object/DEX traversal
@@ -94,8 +94,12 @@ private:
     void scanRegionViaPagemap(const Region& r,
                               const std::function<bool(uint64_t base, const uint8_t* buf, size_t len)>& fn);
     bool readPagemapEntries(uint64_t startAddr, size_t pageCount, std::vector<uint64_t>& out);
+    int ensureMemFd();
 
     int pid_ = -1;
+    bool open_ = false;
+    bool vmReadvUnsupported_ = false;
+    bool memFdAttempted_ = false;
     int memFd_ = -1;
     int pagemapFd_ = -1;
     uint8_t* scanBuf_ = nullptr;

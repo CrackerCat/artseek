@@ -132,24 +132,39 @@ ProcMem::~ProcMem() {
 
 bool ProcMem::open(int pid, std::string* err) {
     close();
-    char memPath[64];
-    std::snprintf(memPath, sizeof(memPath), "/proc/%d/mem", pid);
-    int fd = ::open(memPath, O_RDONLY | O_CLOEXEC);
-    if (fd < 0) {
-        if (err) *err = std::string("open ") + memPath + ": " + std::strerror(errno);
+    if (pid <= 0) {
+        if (err) *err = "invalid pid";
         return false;
     }
+
     char pmPath[64];
     std::snprintf(pmPath, sizeof(pmPath), "/proc/%d/pagemap", pid);
     int pmFd = ::open(pmPath, O_RDONLY | O_CLOEXEC); // optional
 
     pid_ = pid;
-    memFd_ = fd;
     pagemapFd_ = pmFd;
+    vmReadvUnsupported_ = false;
+    memFdAttempted_ = false;
+
+#ifndef SYS_process_vm_readv
+    vmReadvUnsupported_ = true;
+    if (ensureMemFd() < 0) {
+        int savedErr = errno;
+        if (err) {
+            char memPath[64];
+            std::snprintf(memPath, sizeof(memPath), "/proc/%d/mem", pid);
+            *err = std::string("open ") + memPath + ": " + std::strerror(savedErr);
+        }
+        close();
+        return false;
+    }
+#endif
+
     if (!refreshMaps(err)) {
         close();
         return false;
     }
+    open_ = true;
     return true;
 }
 
@@ -158,10 +173,23 @@ void ProcMem::close() {
     if (memFd_ >= 0) { ::close(memFd_); memFd_ = -1; }
     if (pagemapFd_ >= 0) { ::close(pagemapFd_); pagemapFd_ = -1; }
     pid_ = -1;
+    open_ = false;
+    vmReadvUnsupported_ = false;
+    memFdAttempted_ = false;
     allRegions_.clear();
     heapRegions_.clear();
     roFileRegions_.clear();
     mainBitmap_ = LiveBitmapInfo{};
+}
+
+int ProcMem::ensureMemFd() {
+    if (memFd_ >= 0) return memFd_;
+    if (memFdAttempted_ || pid_ <= 0) return -1;
+    memFdAttempted_ = true;
+    char memPath[64];
+    std::snprintf(memPath, sizeof(memPath), "/proc/%d/mem", pid_);
+    memFd_ = ::open(memPath, O_RDONLY | O_CLOEXEC);
+    return memFd_;
 }
 
 static bool containsSub(const std::string& s, const char* sub) {
@@ -323,13 +351,24 @@ bool ProcMem::isMappedRange(uint64_t addr, size_t len) const {
 size_t ProcMem::readRaw(uint64_t addr, void* dst, size_t len) {
     if (len == 0 || pid_ <= 0) return 0;
 #ifdef SYS_process_vm_readv
-    struct iovec local_iov{dst, len};
-    struct iovec remote_iov{reinterpret_cast<void*>(static_cast<uintptr_t>(addr)), len};
-    ssize_t n = ::syscall(SYS_process_vm_readv, pid_, &local_iov, 1UL, &remote_iov, 1UL, 0UL);
-    if (n > 0) return static_cast<size_t>(n);
+    if (!vmReadvUnsupported_) {
+        struct iovec local_iov{dst, len};
+        struct iovec remote_iov{reinterpret_cast<void*>(static_cast<uintptr_t>(addr)), len};
+        ssize_t n = ::syscall(SYS_process_vm_readv, pid_, &local_iov, 1UL, &remote_iov, 1UL, 0UL);
+        if (n > 0) return static_cast<size_t>(n);
+        if (n == 0) return 0;
+        int e = errno;
+        // Normal address-level errors (e.g. EFAULT on unmapped/guard pages, ESRCH, EINVAL, ENOMEM)
+        // must NOT trigger opening /proc/<pid>/mem, which can trip inotify anti-dump watches.
+        if (e != ENOSYS && e != EPERM && e != EACCES) {
+            return 0;
+        }
+        vmReadvUnsupported_ = true;
+    }
 #endif
-    if (memFd_ >= 0) {
-        ssize_t n2 = ::pread64(memFd_, dst, len, static_cast<off64_t>(addr));
+    int fd = ensureMemFd();
+    if (fd >= 0) {
+        ssize_t n2 = ::pread64(fd, dst, len, static_cast<off64_t>(addr));
         if (n2 > 0) return static_cast<size_t>(n2);
     }
     return 0;
