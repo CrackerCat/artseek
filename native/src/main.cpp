@@ -19,7 +19,7 @@
 
 namespace artseek {
 
-static constexpr const char* kVersion = "0.1.0";
+static constexpr const char* kVersion = "0.1.1";
 static constexpr const char* kDefaultCacheDir = "/data/local/tmp/.artseek";
 
 struct ServerState {

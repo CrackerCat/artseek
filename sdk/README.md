@@ -71,7 +71,7 @@ Query grammar: [protocol.md](https://github.com/std-microblock/artseek/blob/mast
 ## What it does not do
 
 - No code injection, no hooking, no `ptrace` attach to the target process
-- No writes to app memory or files; everything is read through `/proc/<pid>/mem`
+- No writes to app memory or files; memory is read via `process_vm_readv` (with lazy `/proc/<pid>/mem` fallback)
 - No cloud service, no telemetry: the SDK talks to your device and nothing else
 
 ## License

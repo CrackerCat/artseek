@@ -1,6 +1,6 @@
 {
   "name": "artseek",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Root, zero-injection, read-only Android ART heap & View inspector SDK",
   "type": "module",
   "license": "MIT",

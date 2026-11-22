@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { createArtseekClient } from './client.js';
 import type { QuerySpec } from './types.js';
 
-const VERSION = '0.1.0';
+const VERSION = '0.1.1';
 
 const HELP_TEXT = `artseek v${VERSION} — Android ART heap & View inspector CLI
 

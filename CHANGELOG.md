@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions adhere to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-11-22
+
+### Fixed
+
+- Lazily open `/proc/<pid>/mem` only when `process_vm_readv` returns `ENOSYS`, `EPERM`, or
+  `EACCES`, avoiding `IN_OPEN` triggers on `/proc/<pid>/mem` `inotify` watches in hardened apps.
+- Support merged `Class.fields_` layout on newer ART (`29ef591`).
+
 ## [0.1.0] - 2026-11-22
 
 First public release: the SDK is published to npm as `artseek`, and the native
